@@ -1,0 +1,36 @@
+ APINC VHFFS API REST
+=====================
+
+Pour installer l'API REST APINC VHFFS en version de développement, il faut :
+
+# mettre en place la db vhffs
+apt-get install postgresql
+su - postgres -c "createuser -P apinc"
+  Le nouveau rôle est-il super-utilisateur ? (o/n) n
+  Le nouveau rôle est-il autorisé à créer des bases de données ? (o/n) n
+  Le nouveau rôle est-il autorisé à créer de nouveaux rôles ? (o/n) n
+su - postgres -c "createdb -O apinc vhffs"
+psql vhffs apinc -h localhost
+vhffs=> \i vhffs-api/initdb.sql
+
+# installer le package DEBIAN vhffs-api
+echo "deb http://downloads.tuxfamily.org/vhffs4/releases/debian/ stable main" > /etc/apt/sources.list.d/vhffs.list
+apt-get update && apt-get install vhffs-api vhffs-common
+
+# installer les dépendances DEBIAN vhffs (runtime)
+apt-get install libdbd-pg-perl libdbi-perl libmime-lite-perl libcrypt-gpg-perl libcrypt-passwdmd5-perl libemail-valid-perl libconfig-general-perl
+
+# éditer la section <database> du fichier /etc/vhffs/vhffs.conf pour adapter la configuration
+
+# installer le package DEBIAN (framework perldancer)
+echo "deb http://apt.apinc.org/debian/ stable main" > /etc/apt/sources.list.d/apinc.list
+apt-get update && apt-get install libdancer-perl
+
+# récupérer les sources de l'API (à priori si vous lisez ce fichier, c'est deja fait)
+git clone git@git.apinc.org:apinc-vhffs-rest.git
+
+# checkout une nouvelle branche locale develop qui suit la branche remote develop existante
+git checkout --track -b develop origin/develop
+
+# lancer le serveur : ./VhffsRestApi/bin/app.pl
+# vous pouvez accéder à l'application à l'URL : http://localhost:3000
