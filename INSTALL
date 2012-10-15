@@ -10,8 +10,8 @@ su - postgres -c "createuser -P apinc"
   Le nouveau rôle est-il autorisé à créer des bases de données ? (o/n) n
   Le nouveau rôle est-il autorisé à créer de nouveaux rôles ? (o/n) n
 su - postgres -c "createdb -O apinc vhffs_test"
-psql vhffs apinc -h localhost
-vhffs=> \i vhffs-api/initdb.sql
+psql vhffs_test apinc -h localhost
+vhffs_test=> \i /usr/share/vhffs/backend/initdb.sql
 
 # installer le package DEBIAN vhffs-api
 echo "deb http://downloads.tuxfamily.org/vhffs4/releases/debian/ stable main" > /etc/apt/sources.list.d/vhffs.list
