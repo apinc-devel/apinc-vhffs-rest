@@ -22,9 +22,9 @@ apt-get install libdbd-pg-perl libdbi-perl libmime-lite-perl libcrypt-gpg-perl l
 
 # éditer la section <database> du fichier /etc/vhffs/vhffs.conf pour adapter la configuration
 
-# installer le package DEBIAN (framework perldancer)
+# installer les packages DEBIAN framework perldancer (et dépendances)
 echo "deb http://apt.apinc.org/debian/ stable main" > /etc/apt/sources.list.d/apinc.list
-apt-get update && apt-get install libdancer-perl
+apt-get update && apt-get install libdancer-perl libxml-simple-perl libjson-perl
 
 # récupérer les sources de l'API (à priori si vous lisez ce fichier, c'est deja fait)
 git clone git@git.apinc.org:apinc-vhffs-rest.git
