@@ -15,18 +15,20 @@
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 package VhffsRestApi;
-use Dancer ':syntax';
-use VhffsRestApi::HTTP::Status;
-
-our $VERSION = '0.1';
 
 use strict;
-use lib '/usr/share/vhffs/api';
+use utf8;
+use Dancer ':syntax';
 
+use VhffsRestApi::HTTP::Status;
+
+use lib '/usr/share/vhffs/api';
 use Vhffs::User;
 use Vhffs::Group;
 use Vhffs;
 use Vhffs::Object;
+
+our $VERSION = '0.1';
  
 my $vhffs = new Vhffs;
  

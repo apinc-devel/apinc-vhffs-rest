@@ -15,7 +15,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+use strict;
+use utf8;
+use Switch;
+
 use Dancer;
+use VhffsRestApi;
+use VhffsRestApi::Development;
 
 # changing default settings
 # By default, Dancer uses config.yml for the application's settings.
@@ -23,7 +30,10 @@ use Dancer;
 set warnings => false;
 set serializer => 'JSON';
 
-use strict;
-use VhffsRestApi;
 
-dance;
+dance unless defined $ARGV[0];
+
+switch ($ARGV[0]) {
+    case('build_database') { VhffsRestApi::Development::build_database; }
+    else { print "Not a valid argument.\n"; }
+}

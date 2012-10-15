@@ -18,7 +18,9 @@
 # http://cpansearch.perl.org/src/SUKRIA/Dancer-Plugin-REST-0.07/lib/Dancer/Plugin/REST.pm
 
 package VhffsRestApi::HTTP::Status;
+
 use strict;
+use utf8;
 use warnings;
 
 use Dancer ':syntax';
