@@ -1,5 +1,5 @@
 #
-#   Copyright © 2012 APINC Devel Team
+#   Copyright © 2012-2013 APINC Devel Team
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 package VhffsRestApi::Development;
 
 use strict;
+use utf8;
 use warnings;
 
 use lib '/usr/share/vhffs/api';
@@ -31,24 +32,25 @@ use Vhffs::Object;
 
 sub build_database {
 
-# note : pour recréer la base dans un shell faire :
-# su - postgres -c 'dropdb vhffs_test'
-# su - postgres -c 'createdb -O apinc vhffs_test'
-# psql vhffs_test apinc -h localhost
-#     vhffs_test => \i /usr/share/vhffs/backend/initdb.sql
+    # note : pour recréer la base dans un shell faire :
+    # su - postgres -c 'dropdb vhffs_test'
+    # su - postgres -c 'createdb -O apinc vhffs_test'
+    # psql vhffs_test apinc -h localhost
+    #     vhffs_test => \i /usr/share/vhffs/backend/initdb.sql
 
+    # importer des utilisateurs dans la base pour faciliter le dévelopement
     my @users = (
         {
             username => 'laurent',
-            mail     => 'l@l.l',
+            mail     => 'laurent@laurent.la',
         },
         {
             username => 'setaou',
-            mail     => 's@s.s',
+            mail     => 'setaou@setaou.se',
         },
         {
             username => 'misric',
-            mail     => 'm@m.m',
+            mail     => 'misric@misric.mi',
         }
     );
 
@@ -71,4 +73,5 @@ sub build_database {
         }
     }
 }
+
 1;
