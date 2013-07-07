@@ -30,6 +30,7 @@ while ($do_it !~ /^[nN][oO]|[yY][eE][sS]$/) {
     chomp $do_it;
 
     if ($do_it =~ m/[yY][eE][sS]/) {
+        debug "Filling vhffs database with development data."
         VhffsRestApi::Development::build_database;
     }
 }
