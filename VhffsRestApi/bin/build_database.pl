@@ -23,4 +23,15 @@ use warnings;
 use Dancer;
 use VhffsRestApi::Development;
 
-VhffsRestApi::Development::build_database;
+my $do_it = '';
+while ($do_it !~ /^[nN][oO]|[yY][eE][sS]$/) {
+    print "Do you want to fill vhffs database with developement data ? (yes/no) : ";
+    $do_it = <STDIN>;
+    chomp $do_it;
+
+    if ($do_it =~ m/[yY][eE][sS]/) {
+        VhffsRestApi::Development::build_database;
+    }
+}
+
+1;

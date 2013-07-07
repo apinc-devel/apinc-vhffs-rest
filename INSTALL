@@ -33,7 +33,7 @@ git clone git@git.apinc.org:apinc-vhffs-rest.git
 git checkout --track -b develop origin/develop
 
 # créer la base de données initiale
-./VhffsRestApi/bin/app.pl build_database
+./VhffsRestApi/bin/build_database.pl
 
 # lancer le serveur : ./VhffsRestApi/bin/app.pl
 # vous pouvez accéder à l'api : curl -v http://localhost:3000/api/user/laurent

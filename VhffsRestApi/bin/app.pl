@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-#   Copyright © 2012 APINC Devel Team
+#   Copyright © 2012-2013 APINC Devel Team
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -31,10 +31,4 @@ use VhffsRestApi::Development;
 set warnings => false;
 set serializer => 'JSON';
 
-
-dance unless defined $ARGV[0];
-
-switch ($ARGV[0]) {
-    case('build_database') { VhffsRestApi::Development::build_database; }
-    else { print "Not a valid argument.\n"; }
-}
+dance;

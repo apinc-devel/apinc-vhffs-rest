@@ -41,34 +41,88 @@ sub build_database {
     # importer des utilisateurs dans la base pour faciliter le dévelopement
     my @users = (
         {
-            username => 'laurent',
-            mail     => 'laurent@laurent.la',
+            username  => 'laurent',
+            firstname => 'Laurent',
+            lastname  => 'Drift',
+            mail      => 'laurent@laurent.la',
         },
         {
-            username => 'setaou',
-            mail     => 'setaou@setaou.se',
+            username  => 'setaou',
+            firstname => 'Hervé',
+            lastname  => 'Setaou',
+            mail      => 'setaou@setaou.se',
         },
         {
-            username => 'misric',
-            mail     => 'misric@misric.mi',
+            username  => 'misric',
+            firstname => 'Sylvain',
+            lastname  => 'Misric',
+            mail      => 'misric@misric.mi',
+        },
+        {
+            username  => 'contributeur',
+            firstname => 'Contrib',
+            lastname  => 'Uter',
+            mail      => 'contributeur@contributeur.co',
         }
     );
 
+
+    my @groups = (
+        {
+            groupname => 'project1',
+            username  => 'contributeur',
+        },
+        {
+            groupname => 'project2',
+            username  => 'contributeur',
+        }
+    );
+            
     my $vhffs = new Vhffs;
 
     foreach (@users) {
-        my ($username, $mail) = ($_->{username}, $_->{mail});
+        my ($username, $mail, $firstname, $lastname) = ($_->{username}, $_->{mail}, $_->{firstname}, $_->{lastname});
         my $user = Vhffs::User::get_by_username( $vhffs , $username );
         if ( defined $user ) {
             print "User $username already exists skipping...\n";
         }
         else {      
-            $user = Vhffs::User::create($vhffs, $username, $username, 0, $mail);
+            $user = Vhffs::User::create($vhffs, $username, $username, 0, $mail, $firstname, $lastname);
             if( !defined $user ) {
                 print "Unable to create $username\n";
             }
             else {
                 print "User $username created!\n";
+                # pour le dév on skip la création via les robots
+		$user->set_status( Vhffs::Constants::ACTIVATED );
+		$user->commit;
+            }
+        }
+    }
+
+
+
+    foreach (@groups) {
+        my ($groupname, $username, $gid) = ($_->{groupname}, $_->{username}, $_->{gid});
+        my $owner = Vhffs::User::get_by_username( $vhffs, $username );
+        return undef unless defined($owner);
+
+        my $group = Vhffs::Group::get_by_groupname( $vhffs , $groupname );
+
+        if ( defined $group ) {
+            print "Group $groupname already exists skipping...\n";
+        }
+        else {   
+    # my $group = Vhffs::Group::create($vhffs, $groupname, $realname, $owner_uid, $gid, $description)
+            $group = Vhffs::Group::create($vhffs, $groupname, $groupname, $owner->{uid}, $gid, "development data" );
+            if( !defined $group ) {
+                print "Unable to create $groupname\n";
+            }
+            else {
+                print "Group $groupname created!\n";
+                # pour le dév on skip la création via les robots
+		$group->set_status( Vhffs::Constants::ACTIVATED );
+		$group->commit;
             }
         }
     }
