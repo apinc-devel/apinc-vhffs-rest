@@ -24,6 +24,7 @@ use Dancer ':syntax';
 use VhffsRestApi::HTTP::Status;
 
 use lib '/usr/share/vhffs/api';
+use Vhffs::Constants;
 use Vhffs::User;
 use Vhffs::Group;
 use Vhffs;
@@ -34,8 +35,54 @@ use Vhffs::Panel::User;
 our $VERSION = '0.1';
  
 my $vhffs = new Vhffs;
- 
-get '/api/user/:username' => sub {
+
+=pod
+
+=head1 NAME
+
+    VHFFS-APINC-REST API - Vhffs REST API used by the APINC platform (apinc-apm)
+
+=head1 SYNOPSIS
+
+    ### TODO
+
+=cut
+
+
+=pod
+=head1 RESTful web API HTTP METHODS 
+=cut
+
+
+=pod
+=head2 Description
+    Exposes all users
+=head2 Access
+    http://server:port/api/users
+=cut
+get '/api/users' => sub {
+    # en attendant le DBIx::Class dans Vhffs...
+
+    my $sql = 'SELECT u.username, u.passwd, u.firstname,  u.lastname, u.mail, o.state '.
+      'FROM vhffs_users u '.
+      'INNER JOIN vhffs_object o ON (o.object_id = u.object_id) '.
+      'ORDER BY u.username';
+
+    my $dbh = $vhffs->get_db();
+    my @users = $dbh->selectall_arrayref($sql, { Slice => {} });
+    return status_not_found ( 'No users found' ) unless(@users);
+
+    status_ok ( to_json( @users, { utf8 => 1 } ) );
+};
+
+
+=pod
+=head2 Description
+    Exposes user with username username
+=head2 Access
+    http://server:port/api/users/username
+=cut
+get '/api/users/:username' => sub {
     my $user = Vhffs::User::get_by_username( $vhffs , params->{username} );
     return status_not_found ( 'User ' . params->{username} . ' not found' ) unless defined $user;
 
@@ -49,20 +96,88 @@ get '/api/user/:username' => sub {
     );
 };
 
-get '/api/users/' => sub {
+
+=pod
+=head2 Description
+    Exposes all members (a member is a vhffs project owner)
+=head2 Access
+    http://server:port/api/members
+=cut
+get '/api/members' => sub {
     # en attendant le DBIx::Class dans Vhffs...
 
-    my $sql = 'SELECT u.username, u.passwd, u.firstname,  u.lastname, u.mail, o.state '.
-      'FROM vhffs_users u '.
-      'INNER JOIN vhffs_object o ON (o.object_id = u.object_id) '.
-      'ORDER BY u.username';
+    my $sql = 'SELECT DISTINCT u.username, u.passwd, u.firstname,  u.lastname, u.mail, o.state '.
+              'FROM vhffs_users u '.
+              'INNER JOIN vhffs_object o '.
+              'ON u.uid = o.owner_uid '.
+              'INNER JOIN vhffs_groups g '.
+              'ON o.object_id = g.object_id '.
+              'WHERE g.groupname != u.username '.
+              'AND o.state = '.Vhffs::Constants::ACTIVATED.' '.
+              'ORDER BY u.username';
 
     my $dbh = $vhffs->get_db();
-    my $users = $dbh->selectall_arrayref($sql, { Slice => {} });
-    return status_not_found ( 'No users found' ) unless defined $users;
+    my @members = $dbh->selectall_arrayref($sql, { Slice => {} });
+    return status_not_found ( 'No member found' ) unless(@members);
 
-    status_ok ( to_json( $users, { utf8 => 1 } ) );
+    status_ok ( to_json( @members, { utf8 => 1 } ) );
 };
+
+
+=pod
+=head2 Description
+    Exposes all ACTIVATED tuples (project, owner)
+=head2 Access
+    http://server:port/api/projects
+=cut
+get '/api/projects' => sub {
+    # en attendant le DBIx::Class dans Vhffs...
+
+    my $sql = 'SELECT g.groupname AS project, u.username AS owner '.
+              'FROM vhffs_users u '.
+              'INNER JOIN vhffs_object o '.
+              'ON u.uid = o.owner_uid '.
+              'INNER JOIN vhffs_groups g '.
+              'ON o.object_id = g.object_id '.
+              'WHERE g.groupname != u.username '.
+              'AND o.state = '.Vhffs::Constants::ACTIVATED.' '.
+              'ORDER BY g.groupname';
+
+    my $dbh = $vhffs->get_db();
+    my @groups = $dbh->selectall_arrayref($sql, { Slice => {} });
+    return status_not_found ( 'No group found' ) unless(@groups);
+
+    status_ok ( to_json( @groups, { utf8 => 1 } ) );
+};
+
+
+=pod
+=head2 Description
+    Exposes a project with name groupname
+=head2 Access
+    http://server:port/api/projects/groupname
+=cut
+get '/api/projects/:groupname' => sub {
+    my $project = Vhffs::Group::get_by_groupname( $vhffs , params->{groupname} );
+    return status_not_found ( 'Project ' . params->{groupname} . ' not found' ) unless defined $project;
+
+    # en attendant le DBIx::Class dans Vhffs...
+
+    my $sql = 'SELECT g.groupname, u.username AS owner , o.date_creation '.
+              'FROM vhffs_users u '.
+              'INNER JOIN vhffs_object o '.
+              'ON u.uid = o.owner_uid '.
+              'INNER JOIN vhffs_groups g '.
+              'ON o.object_id = g.object_id '.
+              'WHERE g.groupname = ?';
+
+    my $dbh = $vhffs->get_db();
+    my $group = $dbh->selectall_arrayref($sql, { Slice => {} }, params->{groupname});
+    return status_not_found ( 'No group found' ) unless($group);
+
+    status_ok ( to_json( $group, { utf8 => 1 } ) );
+};
+
 
 =pod
 post '/api/user/' => sub {
@@ -96,39 +211,6 @@ post '/api/user/' => sub {
 };
 =cut
 
-=pod
-get '/api/authenticate/:username/:passwd' => sub {
-    my $params = request->params;
-    my ($username, $passwd) = ($params->{username}, $params->{passwd});
-
-    my $user = Vhffs::User::get_by_username( $vhffs , $username );
-
-    if ( not defined $user ) {
-       return status_unauthorized ( 'Access denied' );
-    }
-    
-    if ( $user->check_password( $passwd ) ) {
-        status_ok ( { 
-            username => $user->{username},
-            passwd => $user->{passwd},
-            mail => $user->{mail},
-            firstname => $user->{firstname},
-            lastname => $user->{lastname}
-            }
-        );
-    }
-    else {
-        status_unauthorized ( 'Access denied' );
-    }
-};
-=cut
-
-get '/api/groups/' => sub {
-    my $groups = Vhffs::Panel::Group::search_group( $vhffs, "" );
-    return status_not_found ( 'No groups found' ) unless defined $groups;
-
-    status_ok ( to_json( $groups, { utf8 => 1 } ) );
-};
 
 # default route shall remain last one :)
 any qr{.*} => sub {
