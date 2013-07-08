@@ -37,3 +37,9 @@ git checkout --track -b develop origin/develop
 
 # lancer le serveur : ./VhffsRestApi/bin/app.pl
 # vous pouvez accéder à l'api : curl -v http://localhost:3000/api/user/laurent
+
+
+Pour déployer l'API en production via un cgi-script (ou fast-cgi), il faut :
+
+# installer le module Plack::Runner
+apt-get install libplack-perl
