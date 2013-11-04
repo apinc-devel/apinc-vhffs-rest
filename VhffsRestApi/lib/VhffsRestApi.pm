@@ -126,14 +126,15 @@ get '/api/members' => sub {
 
 =pod
 =head2 Description
-    Exposes all ACTIVATED tuples (project, owner)
+    Exposes all ACTIVATED tuples (project, owner, creation_date)
 =head2 Access
     http://server:port/api/projects
 =cut
 get '/api/projects' => sub {
     # en attendant le DBIx::Class dans Vhffs...
 
-    my $sql = 'SELECT g.groupname AS project, u.username AS owner '.
+    my $sql = 'SELECT g.groupname, u.username AS owner, '.
+                'o.date_creation AS creation_date '.
               'FROM vhffs_users u '.
               'INNER JOIN vhffs_object o '.
               'ON u.uid = o.owner_uid '.
