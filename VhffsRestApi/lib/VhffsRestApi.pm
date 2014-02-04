@@ -72,7 +72,8 @@ get '/api/users' => sub {
     my @users = $dbh->selectall_arrayref($sql, { Slice => {} });
     return status_not_found ( 'No users found' ) unless(@users);
 
-    status_ok ( to_json( @users, { utf8 => 1 } ) );
+    #status_ok ( to_json( @users, { utf8 => 1 } ) );
+    status_ok ( to_json( @users ) );
 };
 
 
@@ -120,7 +121,8 @@ get '/api/members' => sub {
     my @members = $dbh->selectall_arrayref($sql, { Slice => {} });
     return status_not_found ( 'No member found' ) unless(@members);
 
-    status_ok ( to_json( @members, { utf8 => 1 } ) );
+    #status_ok ( to_json( @members, { utf8 => 1 } ) );
+    status_ok ( to_json( @members ) );
 };
 
 
@@ -148,7 +150,8 @@ get '/api/projects' => sub {
     my @groups = $dbh->selectall_arrayref($sql, { Slice => {} });
     return status_not_found ( 'No group found' ) unless(@groups);
 
-    status_ok ( to_json( @groups, { utf8 => 1 } ) );
+    #status_ok ( to_json( @groups, { utf8 => 1 } ) );
+    status_ok ( to_json( @groups ) );
 };
 
 
@@ -176,7 +179,8 @@ get '/api/projects/:groupname' => sub {
     my $group = $dbh->selectall_arrayref($sql, { Slice => {} }, params->{groupname});
     return status_not_found ( 'No group found' ) unless($group);
 
-    status_ok ( to_json( $group, { utf8 => 1 } ) );
+    #status_ok ( to_json( $group, { utf8 => 1 } ) );
+    status_ok ( to_json( $group ) );
 };
 
 
